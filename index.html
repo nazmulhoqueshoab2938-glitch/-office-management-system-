@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Management System</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172033;
+    }
+    header {
+      background: #14213d;
+      color: white;
+      padding: 22px;
+      text-align: center;
+    }
+    .container {
+      max-width: 440px;
+      margin: 45px auto;
+      padding: 28px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 5px 22px #00000012;
+    }
+    h2 { text-align: center; margin-top: 0; }
+    label { display: block; margin: 15px 0 6px; }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+    input, select {
+      border: 1px solid #cbd5e1;
+      background: white;
+    }
+    button {
+      margin-top: 20px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #1d4ed8; }
+    #message { margin-top: 15px; text-align: center; }
+    .note {
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Office Management System</h1>
+    <p>Employee Attendance & Salary Management</p>
+  </header>
+
+  <main class="container">
+    <h2>Login to Your Account</h2>
+
+    <form id="loginForm">
+      <label for="role">Login as</label>
+      <select id="role" required>
+        <option value="employee">Employee</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <label for="email">Email Address</label>
+      <input id="email" type="email" placeholder="Enter your email" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+             placeholder="Enter your password" required>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <p class="note">
+      Secure office login. Your account must be created in Supabase
+      before you can sign in.
+    </p>
+  </main>
+
+  <script type="module">
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      message.textContent =
+        "Supabase connection is not configured yet. Please wait for the next setup step.";
+      message.style.color = "#b45309";
+    });
+  </script>
+</body>
+</html>
