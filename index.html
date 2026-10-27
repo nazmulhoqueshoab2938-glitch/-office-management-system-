@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,94 +13,419 @@
       color: #172033;
     }
     header {
-      background: #14213d;
+      background: #172554;
       color: white;
       padding: 22px;
       text-align: center;
     }
-    .container {
-      max-width: 440px;
-      margin: 45px auto;
-      padding: 28px;
-      background: white;
-      border-radius: 14px;
-      box-shadow: 0 5px 22px #00000012;
+    main {
+      width: min(950px, 94%);
+      margin: 28px auto;
     }
-    h2 { text-align: center; margin-top: 0; }
-    label { display: block; margin: 15px 0 6px; }
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px #0000000c;
+    }
     input, select, button {
       width: 100%;
       padding: 12px;
-      border-radius: 7px;
+      margin: 8px 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
       font-size: 15px;
     }
-    input, select {
-      border: 1px solid #cbd5e1;
-      background: white;
-    }
     button {
-      margin-top: 20px;
-      border: none;
       background: #2563eb;
       color: white;
+      border: none;
       cursor: pointer;
       font-weight: bold;
     }
     button:hover { background: #1d4ed8; }
-    #message { margin-top: 15px; text-align: center; }
-    .note {
-      font-size: 13px;
-      color: #64748b;
-      text-align: center;
-      line-height: 1.5;
+    .secondary { background: #475569; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
     }
+    .stat {
+      background: #eff6ff;
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+    .message { white-space: pre-wrap; }
+    .error { color: #b91c1c; }
+    .success { color: #047857; }
+    .muted { color: #64748b; font-size: 14px; }
+    .hidden { display: none; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      white-space: nowrap;
+    }
+    th { background: #f8fafc; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Office Management System</h1>
-    <p>Employee Attendance & Salary Management</p>
-  </header>
 
-  <main class="container">
-    <h2>Login to Your Account</h2>
+<header>
+  <h1>Office Management System</h1>
+  <p>Employee Attendance & Salary Dashboard</p>
+</header>
+
+<main>
+  <section id="loginSection" class="card">
+    <h2>Login</h2>
+    <p class="muted">Use the email and password of your registered account.</p>
 
     <form id="loginForm">
-      <label for="role">Login as</label>
-      <select id="role" required>
+      <label for="email">Email Address</label>
+      <input id="email" type="email" required placeholder="Enter your email">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" required placeholder="Enter your password">
+
+      <label for="role">Login As</label>
+      <select id="role">
         <option value="employee">Employee</option>
         <option value="admin">Admin</option>
       </select>
 
-      <label for="email">Email Address</label>
-      <input id="email" type="email" placeholder="Enter your email" required>
-
-      <label for="password">Password</label>
-      <input id="password" type="password"
-             placeholder="Enter your password" required>
-
       <button type="submit">Login</button>
     </form>
 
-    <p id="message" role="status"></p>
+    <p id="loginMessage" class="message" role="status"></p>
+  </section>
 
-    <p class="note">
-      Secure office login. Your account must be created in Supabase
-      before you can sign in.
-    </p>
-  </main>
+  <section id="dashboard" class="hidden">
+    <div class="card">
+      <h2 id="welcome">Dashboard</h2>
+      <p id="userInfo"></p>
+      <button id="refreshButton">Refresh Data</button>
+      <button id="logoutButton" class="secondary">Logout</button>
+      <p id="dashboardMessage" class="message" role="status"></p>
+    </div>
 
-  <script type="module">
-    const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
+    <div class="grid">
+      <div class="stat">
+        Total Work Hours
+        <strong id="totalHours">0</strong>
+      </div>
+      <div class="stat">
+        Hourly Rate
+        <strong id="hourlyRate">৳140</strong>
+      </div>
+      <div class="stat">
+        Estimated Salary
+        <strong id="totalSalary">৳0</strong>
+      </div>
+      <div class="stat">
+        Work Records
+        <strong id="recordCount">0</strong>
+      </div>
+    </div>
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    <div class="card">
+      <h2>Attendance & Work Records</h2>
+      <p class="muted">
+        Records shown here depend on your account permissions in Supabase.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Break (min)</th>
+              <th>Hours</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTable">
+            <tr><td colspan="6">No records loaded.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-      message.textContent =
-        "Supabase connection is not configured yet. Please wait for the next setup step.";
-      message.style.color = "#b45309";
+    <div id="adminNotice" class="card hidden">
+      <h2>Admin Access</h2>
+      <p>
+        You are logged in with an admin profile. Employee management,
+        attendance editing, and salary payment features require additional
+        secure database policies and workflows before they can be used.
+      </p>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { createClient } from
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const SUPABASE_URL =
+    "https://doirkuusowoqjvmufyja.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_ZV5acpI_fjCJqVl0dn4MAA_3GIGh2ri";
+
+  const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  const $ = id => document.getElementById(id);
+
+  let currentUser = null;
+  let currentProfile = null;
+
+  function showMessage(id, message, type = "") {
+    const element = $(id);
+    element.textContent = message;
+    element.className = "message " + type;
+  }
+
+  function money(value) {
+    return "৳" + Number(value || 0).toLocaleString("en-BD", {
+      maximumFractionDigits: 2
     });
-  </script>
+  }
+
+  function calculateHours(record) {
+    if (!record.start_time || !record.end_time) return 0;
+
+    const start = record.start_time.split(":").map(Number);
+    const end = record.end_time.split(":").map(Number);
+
+    let startMinutes = start[0] * 60 + start[1];
+    let endMinutes = end[0] * 60 + end[1];
+
+    if (endMinutes < startMinutes) endMinutes += 24 * 60;
+
+    const breakMinutes = Number(record.break_minutes || 0);
+
+    return Math.max(
+      0,
+      (endMinutes - startMinutes - breakMinutes) / 60
+    );
+  }
+
+  function escapeText(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
+
+  async function loadDashboard() {
+    if (!currentUser || !currentProfile) return;
+
+    showMessage("dashboardMessage", "Loading work records...");
+
+    const { data, error } = await supabase
+      .from("work_hours")
+      .select("work_date,start_time,end_time,break_minutes,notes")
+      .eq("employee_id", currentUser.id)
+      .order("work_date", { ascending: false });
+
+    if (error) {
+      showMessage(
+        "dashboardMessage",
+        "Could not load work records: " + error.message,
+        "error"
+      );
+      return;
+    }
+
+    const records = data || [];
+    const totalHours = records.reduce(
+      (sum, record) => sum + calculateHours(record),
+      0
+    );
+
+    const rate = Number(currentProfile.hourly_rate ?? 140);
+
+    $("totalHours").textContent = totalHours.toFixed(2);
+    $("hourlyRate").textContent = money(rate);
+    $("totalSalary").textContent = money(totalHours * rate);
+    $("recordCount").textContent = records.length;
+
+    const tbody = $("recordsTable");
+
+    if (records.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="6">No work records found for your account.</td></tr>';
+    } else {
+      tbody.innerHTML = records.map(record => `
+        <tr>
+          <td>${escapeText(record.work_date)}</td>
+          <td>${escapeText(record.start_time || "-")}</td>
+          <td>${escapeText(record.end_time || "-")}</td>
+          <td>${escapeText(record.break_minutes ?? 0)}</td>
+          <td>${calculateHours(record).toFixed(2)}</td>
+          <td>${escapeText(record.notes || "-")}</td>
+        </tr>
+      `).join("");
+    }
+
+    showMessage(
+      "dashboardMessage",
+      "Data loaded successfully.",
+      "success"
+    );
+  }
+
+  async function openDashboard(user, selectedRole) {
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("id,full_name,role,hourly_rate")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      showMessage(
+        "loginMessage",
+        "Unable to read your profile. Check Supabase permissions: " +
+        error.message,
+        "error"
+      );
+      return;
+    }
+
+    if (!profile) {
+      showMessage(
+        "loginMessage",
+        "Login succeeded, but no profile exists for this user. " +
+        "An authorized admin must create the profile first.",
+        "error"
+      );
+      return;
+    }
+
+    if (profile.role !== selectedRole) {
+      showMessage(
+        "loginMessage",
+        "The selected role does not match your registered profile role.",
+        "error"
+      );
+      return;
+    }
+
+    currentUser = user;
+    currentProfile = profile;
+
+    $("loginSection").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+
+    $("welcome").textContent =
+      "Welcome, " + (profile.full_name || user.email || "User");
+
+    $("userInfo").textContent =
+      "Account: " + user.email + " | Role: " + profile.role;
+
+    $("adminNotice").classList.toggle(
+      "hidden",
+      profile.role !== "admin"
+    );
+
+    await loadDashboard();
+  }
+
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    showMessage("loginMessage", "Signing in...");
+
+    const email = $("email").value.trim();
+    const password = $("password").value;
+    const role = $("role").value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      showMessage(
+        "loginMessage",
+        "Login failed: " + error.message +
+        "\nMake sure this account has been registered in Supabase Authentication.",
+        "error"
+      );
+      return;
+    }
+
+    await openDashboard(data.user, role);
+  });
+
+  $("refreshButton").addEventListener("click", loadDashboard);
+
+  $("logoutButton").addEventListener("click", async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      showMessage(
+        "dashboardMessage",
+        "Logout failed: " + error.message,
+        "error"
+      );
+      return;
+    }
+
+    currentUser = null;
+    currentProfile = null;
+
+    $("dashboard").classList.add("hidden");
+    $("loginSection").classList.remove("hidden");
+    $("loginForm").reset();
+
+    showMessage("loginMessage", "You have logged out.", "success");
+  });
+
+  const { data: sessionData } = await supabase.auth.getSession();
+
+  if (sessionData.session) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id,full_name,role,hourly_rate")
+      .eq("id", sessionData.session.user.id)
+      .maybeSingle();
+
+    if (profile) {
+      currentUser = sessionData.session.user;
+      currentProfile = profile;
+
+      $("loginSection").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      $("welcome").textContent =
+        "Welcome, " + (profile.full_name || currentUser.email);
+      $("userInfo").textContent =
+        "Account: " + currentUser.email + " | Role: " + profile.role;
+      $("adminNotice").classList.toggle(
+        "hidden",
+        profile.role !== "admin"
+      );
+
+      await loadDashboard();
+    }
+  }
+</script>
+
 </body>
 </html>
